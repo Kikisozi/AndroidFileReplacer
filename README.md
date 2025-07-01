@@ -1,8 +1,29 @@
-# 安卓文件替换工具
+# 安卓文件替换工具 (Android File Replacer)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-green.svg)](https://github.com/Kikisozi/AndroidFileReplacer)
+[![Language](https://img.shields.io/badge/Language-C%23-orange.svg)](https://github.com/Kikisozi/AndroidFileReplacer)
+[![Framework](https://img.shields.io/badge/Framework-.NET%209.0-purple.svg)](https://github.com/Kikisozi/AndroidFileReplacer)
 
-一个用于远程管理和替换安卓设备文件的跨平台工具，使用 C#/.NET 开发的全栈解决方案。
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Kikisozi/AndroidFileReplacer/main/screenshot.png" alt="AndroidFileReplacer截图" width="800">
+</p>
+
+## 📱 项目简介
+
+**AndroidFileReplacer** 是一款功能强大的开源工具，专为安卓开发者、测试人员和爱好者打造。它提供了一种简单高效的方式来远程管理和替换安卓设备上的文件，无需每次手动连接设备或重新安装应用程序。
+
+这个全栈解决方案结合了ASP.NET Core Web API服务器和WPF桌面客户端，让文件替换操作变得轻松简便。无论您是需要快速更新配置文件、替换资源文件，还是进行批量部署，AndroidFileReplacer都能满足您的需求。
+
+### ✨ 项目亮点
+
+- **双重操作界面**：提供Web界面和桌面客户端两种操作方式，满足不同使用场景
+- **一键替换**：轻松将本地文件推送到安卓设备的指定位置
+- **批量项目管理**：创建和管理多个文件替换项目，实现快速切换和部署
+- **远程设备支持**：通过ADB无线调试功能，连接局域网内的任何安卓设备
+- **安全访问控制**：API密钥认证机制，保障服务端安全
+- **跨平台兼容**：基于.NET技术，支持Windows、macOS和Linux平台
+- **实时文件预览**：支持查看和编辑设备上的文件内容
 
 ## 主要功能
 
@@ -11,6 +32,13 @@
 - **Web管理界面**：通过浏览器进行项目管理和文件上传
 - **桌面客户端**：功能丰富的WPF桌面应用
 - **安全性**：API密钥认证保护服务接口
+
+## 适用场景
+
+- **应用开发测试**：快速更新配置文件，无需重新编译和安装应用
+- **游戏资源更新**：替换游戏资源文件，测试不同素材效果
+- **设备批量配置**：同时管理多台设备的文件部署
+- **自动化测试**：与CI/CD流程集成，自动部署测试文件
 
 ## 项目结构
 
