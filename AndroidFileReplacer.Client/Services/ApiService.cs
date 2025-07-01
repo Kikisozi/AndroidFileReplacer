@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -259,6 +260,60 @@ namespace AndroidFileReplacer.Client.Services
             catch (Exception ex)
             {
                 return new FileEditResponse { Success = false, Message = $"写入文件时出错: {ex.Message}" };
+            }
+        }
+
+        /// <summary>
+        /// 下载文件并推送到设备
+        /// </summary>
+        /// <param name="project">项目信息</param>
+        /// <param name="logCallback">日志回调函数</param>
+        /// <param name="pushFileCallback">推送文件回调函数</param>
+        public async Task DownloadAndPushFile(Project project, Action<string> logCallback, Func<string, string, Task<(bool success, string output)>> pushFileCallback)
+        {
+            try
+            {
+                // 创建临时文件路径
+                string tempFilePath = Path.Combine(Path.GetTempPath(), project.FileName);
+                
+                // 记录日志
+                logCallback?.Invoke($"正在下载文件: {project.FileName}...");
+                
+                // 下载文件
+                byte[] fileData = await DownloadFileAsync(project.FileId);
+                
+                // 写入临时文件
+                await File.WriteAllBytesAsync(tempFilePath, fileData);
+                logCallback?.Invoke($"文件已下载到临时位置: {tempFilePath}");
+                
+                // 推送文件到设备
+                logCallback?.Invoke($"正在推送文件到设备: {project.TargetPath}...");
+                var (success, output) = await pushFileCallback(tempFilePath, project.TargetPath);
+                
+                if (success)
+                {
+                    logCallback?.Invoke($"文件推送成功: {project.TargetPath}");
+                }
+                else
+                {
+                    logCallback?.Invoke($"文件推送失败: {output}");
+                }
+                
+                // 删除临时文件
+                try
+                {
+                    File.Delete(tempFilePath);
+                    logCallback?.Invoke("临时文件已删除");
+                }
+                catch (Exception ex)
+                {
+                    logCallback?.Invoke($"删除临时文件时出错: {ex.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logCallback?.Invoke($"处理文件时出错: {ex.Message}");
+                throw;
             }
         }
     }
