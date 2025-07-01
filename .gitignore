@@ -1,0 +1,55 @@
+# .NET项目的标准.gitignore
+
+# 构建输出目录
+bin/
+obj/
+
+# Visual Studio临时文件
+.vs/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.tmp
+*.log
+
+# 临时文件
+[Tt]emp/
+[Tt]mp/
+
+# IDE文件
+.idea/
+.vscode/
+*.sln.iml
+
+# 上传临时文件目录
+uploads/
+
+# 项目数据文件
+projects.json
+
+# 包文件
+*.nupkg
+*.snupkg
+
+# 调试符号
+*.pdb
+*.nlp
+
+# 特定环境的文件
+*.Development.json
+!appsettings.Development.json
+
+# 分析工具临时文件
+*.dotCover
+*.coverage
+*.opencover.xml
+
+# 缓存目录
+.nuget/
+
+# 系统文件
+.DS_Store
+Thumbs.db 

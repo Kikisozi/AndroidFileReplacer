@@ -1,0 +1,55 @@
+@host = localhost:5057
+@apiKey = YOUR_API_KEY
+
+### 获取项目列表
+GET http://{{host}}/api/projects
+X-API-Key: {{apiKey}}
+
+### 获取文件
+GET http://{{host}}/api/files/{{fileId}}
+X-API-Key: {{apiKey}}
+
+### 读取文件内容
+POST http://{{host}}/api/FileEditor/read
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "filePath": "/storage/emulated/0/example.txt",
+  "adbPath": "path/to/adb.exe"
+}
+
+### 搜索文件内容
+POST http://{{host}}/api/FileEditor/search
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "filePath": "/storage/emulated/0/example.txt",
+  "searchPattern": "search text",
+  "adbPath": "path/to/adb.exe"
+}
+
+### 编辑文件内容
+POST http://{{host}}/api/FileEditor/edit
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "filePath": "/storage/emulated/0/example.txt",
+  "searchPattern": "old text",
+  "replaceContent": "new text",
+  "deleteMatchedContent": false,
+  "adbPath": "path/to/adb.exe"
+}
+
+### 写入文件内容
+POST http://{{host}}/api/FileEditor/write
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "filePath": "/storage/emulated/0/example.txt",
+  "content": "Hello World!",
+  "adbPath": "path/to/adb.exe"
+} 

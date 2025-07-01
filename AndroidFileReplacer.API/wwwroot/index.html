@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安卓文件替换工具 - 管理面板</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        .api-key-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>安卓文件替换工具 - 管理面板</h1>
+        
+        <div class="api-key-section">
+            <div class="form-group">
+                <label for="apiKey">API Key:</label>
+                <input type="text" id="apiKey" placeholder="请输入API Key">
+            </div>
+        </div>
+        
+        <h2>创建新项目</h2>
+        <form id="createProjectForm">
+            <div class="form-group">
+                <label for="projectName">项目名称:</label>
+                <input type="text" id="projectName" required>
+            </div>
+            <div class="form-group">
+                <label for="targetPath">目标路径:</label>
+                <input type="text" id="targetPath" required>
+            </div>
+            <div class="form-group">
+                <label for="projectFile">文件:</label>
+                <input type="file" id="projectFile" required>
+            </div>
+            <button type="submit">创建项目</button>
+        </form>
+        
+        <div id="status"></div>
+        
+        <h2>项目列表</h2>
+        <table id="projectsTable">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>目标路径</th>
+                    <th>文件名</th>
+                    <th>文件大小</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 项目列表将通过JavaScript动态生成 -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 在页面加载时获取项目列表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 尝试从localStorage获取API Key
+            const savedApiKey = localStorage.getItem('apiKey');
+            if (savedApiKey) {
+                document.getElementById('apiKey').value = savedApiKey;
+                fetchProjects();
+            }
+        });
+        
+        // API Key输入事件
+        document.getElementById('apiKey').addEventListener('change', function() {
+            const apiKey = this.value;
+            // 保存到localStorage
+            localStorage.setItem('apiKey', apiKey);
+        });
+        
+        // 表单提交事件
+        document.getElementById('createProjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createProject();
+        });
+        
+        // 获取项目列表
+        function fetchProjects() {
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (!apiKey) {
+                showStatus('请输入API Key', false);
+                return;
+            }
+            
+            showStatus('正在获取项目列表...', true);
+            
+            fetch('/api/projects', {
+                method: 'GET',
+                headers: {
+                    'X-API-Key': apiKey
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`获取项目列表失败: ${response.status} ${response.statusText}\n${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(projects => {
+                displayProjects(projects);
+                showStatus('项目列表获取成功', true);
+            })
+            .catch(error => {
+                console.error('获取项目列表错误:', error);
+                showStatus(`获取项目列表错误: ${error.message}`, false);
+            });
+        }
+        
+        // 显示项目列表
+        function displayProjects(projects) {
+            const tbody = document.querySelector('#projectsTable tbody');
+            tbody.innerHTML = '';
+            
+            if (projects.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6" style="text-align: center;">暂无项目</td>';
+                tbody.appendChild(row);
+                return;
+            }
+            
+            projects.forEach(project => {
+                const row = document.createElement('tr');
+                
+                // 格式化文件大小
+                const fileSize = formatFileSize(project.fileSize);
+                
+                // 格式化日期
+                const createdAt = new Date(project.createdAt).toLocaleString();
+                
+                row.innerHTML = `
+                    <td>${project.name}</td>
+                    <td>${project.targetPath}</td>
+                    <td>${project.fileName}</td>
+                    <td>${fileSize}</td>
+                    <td>${createdAt}</td>
+                    <td>
+                        <button class="delete-btn" data-id="${project.id}">删除</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+                
+                // 为删除按钮添加事件监听
+                row.querySelector('.delete-btn').addEventListener('click', function() {
+                    deleteProject(project.id);
+                });
+            });
+        }
+        
+        // 创建项目
+        function createProject() {
+            const apiKey = document.getElementById('apiKey').value;
+            const name = document.getElementById('projectName').value;
+            const targetPath = document.getElementById('targetPath').value;
+            const file = document.getElementById('projectFile').files[0];
+            
+            if (!apiKey) {
+                showStatus('请输入API Key', false);
+                return;
+            }
+            
+            if (!name || !targetPath || !file) {
+                showStatus('请填写所有必填字段', false);
+                return;
+            }
+            
+            showStatus('正在创建项目...', true);
+            
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('targetPath', targetPath);
+            formData.append('file', file);
+            
+            fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': apiKey
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`创建项目失败: ${response.status} ${response.statusText}\n${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(project => {
+                showStatus('项目创建成功', true);
+                document.getElementById('createProjectForm').reset();
+                fetchProjects();
+            })
+            .catch(error => {
+                console.error('创建项目错误:', error);
+                showStatus(`创建项目错误: ${error.message}`, false);
+            });
+        }
+        
+        // 删除项目
+        function deleteProject(id) {
+            if (!confirm('确定要删除此项目吗？')) {
+                return;
+            }
+            
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (!apiKey) {
+                showStatus('请输入API Key', false);
+                return;
+            }
+            
+            fetch(`/api/projects/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-API-Key': apiKey
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('删除项目失败: ' + response.status);
+                }
+                showStatus('项目删除成功', true);
+                fetchProjects();
+            })
+            .catch(error => {
+                showStatus(error.message, false);
+            });
+        }
+        
+        // 显示状态信息
+        function showStatus(message, isSuccess) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = isSuccess ? 'success' : 'error';
+            statusElement.style.display = 'block';
+            
+            // 5秒后隐藏
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html> 
