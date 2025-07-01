@@ -5,9 +5,7 @@
 [![Language](https://img.shields.io/badge/Language-C%23-orange.svg)](https://github.com/Kikisozi/AndroidFileReplacer)
 [![Framework](https://img.shields.io/badge/Framework-.NET%209.0-purple.svg)](https://github.com/Kikisozi/AndroidFileReplacer)
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Kikisozi/AndroidFileReplacer/main/screenshot.png" alt="AndroidFileReplacer截图" width="800">
-</p>
+
 
 ## 📱 项目简介
 
